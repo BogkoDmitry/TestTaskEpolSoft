@@ -1,0 +1,38 @@
+version: "3.9"
+
+volumes:
+    test-task-db:
+        name: test-task-db
+
+services:
+    test-task-api:
+        build:
+            context: ./TestTaskApi
+            dockerfile: Dockerfile
+        container_name: test-task-api
+        ports:
+            - "5081:80"
+
+    test-task-console-app:
+        build:
+            context: ./TestTaskConsoleApp
+            dockerfile: Dockerfile
+        container_name: test-task-console-app
+        deploy:
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+
+    test-task-db:
+        image: postgres:latest
+        container_name: test-task-db
+        environment:
+            - POSTGRES_DB=TestTaskDb
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=root
+        ports:
+            - "5400:5432"
+        volumes:
+            - test-task-db:/var/lib/postgresql/data
+        
+
